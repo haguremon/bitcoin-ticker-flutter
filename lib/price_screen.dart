@@ -46,13 +46,13 @@ class _PriceScreenState extends State<PriceScreen> {
                   selectedCurrency = newValue!;
                 });
               },
-              items:
+              items: //ジェネリックス便利やー map<T> で　T型を返す
                   currenciesList.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
                 );
-              }).toList(),//toListでlistに変更できてる
+              }).toList(),//Iterable型をtoListでlistに変更できてる
             ),
           ),
         ],
