@@ -1,26 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart'; //カプチーノを使う事によってiosのデザインが使える
-import 'coin_data.dart';
-import 'components/reusable_card.dart';
+import '../service/coin_data.dart';
+import '../components/reusable_card.dart';
 import 'dart:io'
     show Platform; //でデバイスの切り替えができる showを使う事によって限定的にできる？hide で隠すこともできる？
 
 // ignore: use_key_in_widget_constructors
 class PriceScreen extends StatefulWidget {
+  final CoinData coindata = CoinData();
+
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
+  @override
+  void initState() {
+    super.initState();
+    () async {
+      List<dynamic> ratedata = await widget.coindata.fetchDataList('AUD');
+      await updataUI(ratedata);
+    };
+  }
+
+  String _selectedCurrency = 'AUD';
+  int? _btcrate;
+  int? _ethrate;
+  int? _ltcrate;
+  String errorMessage = 'エラーが発生しました';
+
+  Future updataUI(List<dynamic> ratadata) async {
+    var baseBTC = await ratadata[0];
+    var baseETH = await ratadata[1];
+    var baseLTC = await ratadata[2];
+
+    setState(() {
+      if (baseBTC == null && baseETH == null && baseLTC == null) {
+        return;
+      }
+      _btcrate = baseBTC['rate'].toInt() ?? 0;
+      _ethrate = baseETH['rate'].toInt() ?? 0;
+      _ltcrate = baseLTC['rate'].toInt() ?? 0;
+    });
+  }
 
   CupertinoPicker iOSPicker() {
     return CupertinoPicker(
         backgroundColor: Colors.lightBlue,
-        onSelectedItemChanged: (value) {
+        onSelectedItemChanged: (value) async {
           setState(() {
-            selectedCurrency = currenciesList[value];
+            _selectedCurrency = currenciesList[value];
           });
+          List<dynamic> ratedata =
+              await widget.coindata.fetchDataList(_selectedCurrency);
+          await updataUI(ratedata);
         },
         itemExtent: 20,
         children: currenciesList.map<Text>((String currency) {
@@ -30,7 +63,7 @@ class _PriceScreenState extends State<PriceScreen> {
 
   DropdownButton<String> androidDropdownButton() {
     return DropdownButton<String>(
-      value: selectedCurrency,
+      value: _selectedCurrency,
       icon: const Icon(Icons.arrow_downward),
       elevation: 16,
       style: const TextStyle(color: Colors.white),
@@ -38,10 +71,13 @@ class _PriceScreenState extends State<PriceScreen> {
         height: 2,
         color: Colors.white,
       ),
-      onChanged: (String? newValue) {
+      onChanged: (String? newValue) async {
         setState(() {
-          selectedCurrency = newValue!;
+          _selectedCurrency = newValue!;
         });
+        List<dynamic> ratedata =
+            await widget.coindata.fetchDataList(_selectedCurrency);
+        await updataUI(ratedata);
       },
       items: //ジェネリックス便利やー map<T> で　T型を返す
           currenciesList.map<DropdownMenuItem<String>>((String value) {
@@ -66,19 +102,22 @@ class _PriceScreenState extends State<PriceScreen> {
         children: <Widget>[
           Column(children: <Widget>[
             ReusableCard(
-              label: '1 BTC = ? $selectedCurrency',
+              label:
+                  '1 ${cryptoList[0]} = ${_btcrate ?? errorMessage} $_selectedCurrency',
             ),
             ReusableCard(
-              label: '1 BTC = ? $selectedCurrency',
+              label:
+                  '1 ${cryptoList[1]} = ${_ethrate ?? errorMessage} $_selectedCurrency',
             ),
             ReusableCard(
-              label: '1 BTC = ? $selectedCurrency',
+              label:
+                  '1 ${cryptoList[2]} = ${_ltcrate ?? errorMessage} $_selectedCurrency',
             ),
           ]),
           Container(
-            height: 100.0,
+            height: 70.0,
             alignment: Alignment.center,
-            padding: const EdgeInsets.only(bottom: 30.0),
+            padding: const EdgeInsets.only(bottom: 20.0),
             color: Colors.lightBlue,
             child: Platform.isIOS ? iOSPicker() : androidDropdownButton(),
           ),
