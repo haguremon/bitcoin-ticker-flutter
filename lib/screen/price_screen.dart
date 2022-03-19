@@ -7,40 +7,45 @@ import 'dart:io'
 
 // ignore: use_key_in_widget_constructors
 class PriceScreen extends StatefulWidget {
-  final CoinData coindata = CoinData();
+  final List<dynamic> audRateData;
+  // ignore: prefer_const_constructors_in_immutables, use_key_in_widget_constructors
+  const PriceScreen({required this.audRateData});
 
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  @override
-  void initState() {
-    super.initState();
-    () async {
-      List<dynamic> ratedata = await widget.coindata.fetchDataList('AUD');
-      await updataUI(ratedata);
-    };
-  }
-
   String _selectedCurrency = 'AUD';
   int? _btcrate;
   int? _ethrate;
   int? _ltcrate;
-  String errorMessage = 'エラーが発生しました';
+  String errorMessage = '取得できませんでした';
+
+  CoinData coindata = CoinData();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAUDrate(widget.audRateData);
+  }
+
+  void fetchAUDrate(List<dynamic> audRateData) async {
+    await updataUI(audRateData);
+  }
 
   Future updataUI(List<dynamic> ratadata) async {
-    var baseBTC = await ratadata[0];
-    var baseETH = await ratadata[1];
-    var baseLTC = await ratadata[2];
-
     setState(() {
-      if (baseBTC == null && baseETH == null && baseLTC == null) {
+      if (ratadata.contains([null, null, null])) {
+        print('ratadata.contains([null, null, null])');
         return;
       }
-      _btcrate = baseBTC['rate'].toInt() ?? 0;
-      _ethrate = baseETH['rate'].toInt() ?? 0;
-      _ltcrate = baseLTC['rate'].toInt() ?? 0;
+      _btcrate = ratadata[0]['rate'].toInt() ?? 0;
+      _ethrate = ratadata[1]['rate'].toInt() ?? 0;
+      _ltcrate = ratadata[2]['rate'].toInt() ?? 0;
+      print(
+          'print(_ltcrate);print(_ltcrate);print(_ltcrate);print(_ltcrate);print(_ltcrate);');
+    
     });
   }
 
@@ -52,7 +57,7 @@ class _PriceScreenState extends State<PriceScreen> {
             _selectedCurrency = currenciesList[value];
           });
           List<dynamic> ratedata =
-              await widget.coindata.fetchDataList(_selectedCurrency);
+              await coindata.fetchDataList(_selectedCurrency);
           await updataUI(ratedata);
         },
         itemExtent: 20,
@@ -76,7 +81,7 @@ class _PriceScreenState extends State<PriceScreen> {
           _selectedCurrency = newValue!;
         });
         List<dynamic> ratedata =
-            await widget.coindata.fetchDataList(_selectedCurrency);
+            await coindata.fetchDataList(_selectedCurrency);
         await updataUI(ratedata);
       },
       items: //ジェネリックス便利やー map<T> で　T型を返す
@@ -91,6 +96,7 @@ class _PriceScreenState extends State<PriceScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('🤑 Coin Ticker'),
