@@ -1,5 +1,6 @@
-import '../secret_consts.dart';
-import 'networkhelper.dart';
+import 'dart:convert';
+import 'package:bitcoin_ticker_flutter/secret_consts.dart';
+import 'package:http/http.dart' as http;
 
 const List<String> currenciesList = [
   'AUD',
@@ -25,38 +26,30 @@ const List<String> currenciesList = [
   'ZAR'
 ];
 
-const List<String> cryptoList = [
-  'BTC',
-  'ETH',
-  'LTC',
-];
+const List<String> cryptoList = ['BTC', 'ETH', 'LTC'];
 
-const coinapiURLString = 'https://rest.coinapi.io/v1/exchangerate/';
+const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
 
 class CoinData {
-  //List<decodeData>を取ってくる
-  Future<List<dynamic>> fetchDataList(String currency) async {
-    List<String> coinapiURLs = cryptoList.map((String crypto) {
-      String coinapiURL = '$coinapiURLString$crypto/$currency?apikey=$apikey';
-      return coinapiURL;
-    }).toList();
-    List<dynamic> dataList =
-        await Future.wait(coinapiURLs.map((String coinapiURL) async {
-      NetworkHelper networkHelper = NetworkHelper(coinapiURL);
-      var list = await networkHelper.fetchData();
-      return list;
-    }).toList())
-            .then(
-      (content) {
-        print(content.contains([null,null,null]));
-        return content;
-      },
-    ).catchError(
-      (e) {
-        e ='Problem with the get request';
-        throw e;
-      },
-    );
-    return dataList;
+  Future getCoinData(String selectedCurrency) async {
+    //4: Use a for loop here to loop through the cryptoList and request the data for each of them in turn.
+    //5: Return a Map of the results instead of a single value.
+    Map<String, String> cryptoPrices = {};
+    for (String crypto in cryptoList) {
+      //Update the URL to use the crypto symbol from the cryptoList
+      String requestURL =
+          '$coinAPIURL/$crypto/$selectedCurrency?apikey=$apikey';
+      http.Response response = await http.get(Uri.parse(requestURL));
+      if (response.statusCode == 200) {
+        var decodedData = jsonDecode(response.body);
+        double lastPrice = decodedData['rate'];
+        //Create a new key value pair, with the key being the crypto symbol and the value being the lastPrice of that crypto currency.
+        cryptoPrices[crypto] = lastPrice.toStringAsFixed(0);
+      } else {
+        print(response.statusCode);
+        throw 'Problem with the get request';
+      }
+    }
+    return cryptoPrices;
   }
 }
