@@ -11,7 +11,7 @@ class ReusableCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(5.0, 15.0, 5.0, 0),
+      padding: const EdgeInsets.fromLTRB(18.0, 15.0, 18.0, 0),
       child: Card(
         color: Colors.lightBlueAccent,
         elevation: 5.0,
@@ -19,14 +19,15 @@ class ReusableCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10.0),
         ),
         child:  Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 80.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 28.0),
           child: Text(
             label,
             textAlign: TextAlign.center,
             style:const TextStyle(
-              fontSize: 18.0,
-              color: Colors.white,
+              fontSize: 15.0,
+              color: Colors.white,  
             ),
+            textScaleFactor: 1.0,
           ),
         ),
       ),
