@@ -22,12 +22,10 @@ class _PriceScreenState extends State<PriceScreen> {
   int? _ltcrate;
   String errorMessage = '取得できませんでした';
 
-  CoinData coindata = CoinData();
-
   @override
   void initState() {
     super.initState();
-    fetchAUDrate(widget.audRateData);
+    getData();
   }
 
   void fetchAUDrate(List<dynamic> rateAUDListData) async {
@@ -42,10 +40,26 @@ class _PriceScreenState extends State<PriceScreen> {
       _btcrate = rataListData[0]['rate'].toInt() ?? 0;
       _ethrate = rataListData[1]['rate'].toInt() ?? 0;
       _ltcrate = rataListData[2]['rate'].toInt() ?? 0;
-    
     });
   }
 
+  void getData() async {
+    //7: Second, we set it to true when we initiate the request for prices.
+
+    try {
+      //6: Update this method to receive a Map containing the crypto:price key value pairs.
+      List<dynamic> ratedata =
+          await CoinData().fetchDataList(_selectedCurrency);
+      //7. Third, as soon the above line of code completes, we now have the data and no longer need to wait. So we can set isWaiting to false.
+      setState(() {
+        _btcrate = ratedata[0]['rate'].toInt() ?? 0;
+        _ethrate = ratedata[1]['rate'].toInt() ?? 0;
+        _ltcrate = ratedata[2]['rate'].toInt() ?? 0;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   CupertinoPicker iOSPicker() {
     return CupertinoPicker(
@@ -55,7 +69,7 @@ class _PriceScreenState extends State<PriceScreen> {
             _selectedCurrency = currenciesList[value];
           });
           List<dynamic> ratedata =
-              await coindata.fetchDataList(_selectedCurrency);
+              await CoinData().fetchDataList(_selectedCurrency);
           await updataUI(ratedata);
         },
         itemExtent: 20,
@@ -77,10 +91,8 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (String? newValue) async {
         setState(() {
           _selectedCurrency = newValue!;
+          getData();
         });
-        List<dynamic> ratedata =
-            await coindata.fetchDataList(_selectedCurrency);
-        await updataUI(ratedata);
       },
       items: //ジェネリックス便利やー map<T> で　T型を返す
           currenciesList.map<DropdownMenuItem<String>>((String value) {
@@ -94,7 +106,6 @@ class _PriceScreenState extends State<PriceScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('🤑 Coin Ticker'),
@@ -105,21 +116,21 @@ class _PriceScreenState extends State<PriceScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Column(
-            crossAxisAlignment:  CrossAxisAlignment.stretch,
-            children: <Widget>[
-            ReusableCard(
-              label:
-                  '1 ${cryptoList[0]} = ${_btcrate ?? errorMessage} $_selectedCurrency',
-            ),
-            ReusableCard(
-              label:
-                  '1 ${cryptoList[1]} = ${_ethrate ?? errorMessage} $_selectedCurrency',
-            ),
-            ReusableCard(
-              label:
-                  '1 ${cryptoList[2]} = ${_ltcrate ?? errorMessage} $_selectedCurrency',
-            ),
-          ]),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                ReusableCard(
+                  label:
+                      '1 ${cryptoList[0]} = ${_btcrate ?? errorMessage} $_selectedCurrency',
+                ),
+                ReusableCard(
+                  label:
+                      '1 ${cryptoList[1]} = ${_ethrate ?? errorMessage} $_selectedCurrency',
+                ),
+                ReusableCard(
+                  label:
+                      '1 ${cryptoList[2]} = ${_ltcrate ?? errorMessage} $_selectedCurrency',
+                ),
+              ]),
           Container(
             height: 70.0,
             alignment: Alignment.center,
