@@ -30,24 +30,22 @@ class _PriceScreenState extends State<PriceScreen> {
     fetchAUDrate(widget.audRateData);
   }
 
-  void fetchAUDrate(List<dynamic> audRateData) async {
-    await updataUI(audRateData);
+  void fetchAUDrate(List<dynamic> rateAUDListData) async {
+    await updataUI(rateAUDListData);
   }
 
-  Future updataUI(List<dynamic> ratadata) async {
+  Future updataUI(List<dynamic> rataListData) async {
     setState(() {
-      if (ratadata.contains([null, null, null])) {
-        print('ratadata.contains([null, null, null])');
+      if (rataListData.contains([null, null, null])) {
         return;
       }
-      _btcrate = ratadata[0]['rate'].toInt() ?? 0;
-      _ethrate = ratadata[1]['rate'].toInt() ?? 0;
-      _ltcrate = ratadata[2]['rate'].toInt() ?? 0;
-      print(
-          'print(_ltcrate);print(_ltcrate);print(_ltcrate);print(_ltcrate);print(_ltcrate);');
+      _btcrate = rataListData[0]['rate'].toInt() ?? 0;
+      _ethrate = rataListData[1]['rate'].toInt() ?? 0;
+      _ltcrate = rataListData[2]['rate'].toInt() ?? 0;
     
     });
   }
+
 
   CupertinoPicker iOSPicker() {
     return CupertinoPicker(
@@ -106,7 +104,9 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Column(children: <Widget>[
+          Column(
+            crossAxisAlignment:  CrossAxisAlignment.stretch,
+            children: <Widget>[
             ReusableCard(
               label:
                   '1 ${cryptoList[0]} = ${_btcrate ?? errorMessage} $_selectedCurrency',

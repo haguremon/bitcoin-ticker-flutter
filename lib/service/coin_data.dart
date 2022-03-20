@@ -48,12 +48,12 @@ class CoinData {
     }).toList())
             .then(
       (content) {
-        print(content.contains([null,null,null]));
         return content;
       },
     ).catchError(
       (e) {
-        // do something
+        
+        e = 'Problem with the get request';
         throw e;
       },
     );
