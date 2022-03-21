@@ -23,7 +23,7 @@ class _PriceScreenState extends State<PriceScreen> {
 
   void getData() async {
     //7: Second, we set it to true when we initiate the request for prices.
-  isWaiting = true;
+    isWaiting = true;
     try {
       //6: Update this method to receive a Map containing the crypto:price key value pairs.
       var ratedata = await CoinData().fetchDataList(_selectedCurrency);
@@ -93,20 +93,20 @@ class _PriceScreenState extends State<PriceScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 CryptoCard(
-                cryptoCurrency: 'BTC',
-                //7. Finally, we use a ternary operator to check if we are waiting and if so, we'll display a '?' otherwise we'll show the actual price data.
-                value: isWaiting ? '?' : coinValues['BTC'],
-                selectedCurrency: _selectedCurrency),
-                  CryptoCard(
-                cryptoCurrency: 'ETH',
-                value: isWaiting ? '?' : coinValues['ETH'],
-                selectedCurrency: _selectedCurrency,
-              ),
-              CryptoCard(
-                cryptoCurrency: 'LTC',
-                value: isWaiting ? '?' : coinValues['LTC'],
-                selectedCurrency: _selectedCurrency,
-              ),
+                    cryptoCurrency: 'BTC',
+                    //7. Finally, we use a ternary operator to check if we are waiting and if so, we'll display a '?' otherwise we'll show the actual price data.
+                    value: isWaiting ? '?' : coinValues['BTC'],
+                    selectedCurrency: _selectedCurrency),
+                CryptoCard(
+                  cryptoCurrency: 'ETH',
+                  value: isWaiting ? '?' : coinValues['ETH'],
+                  selectedCurrency: _selectedCurrency,
+                ),
+                CryptoCard(
+                  cryptoCurrency: 'LTC',
+                  value: isWaiting ? '?' : coinValues['LTC'],
+                  selectedCurrency: _selectedCurrency,
+                ),
               ]),
           Container(
             height: 70.0,
