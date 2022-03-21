@@ -14,7 +14,7 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String _selectedCurrency = 'AUD';
   bool isWaiting = false;
-  List<String> coinValues = [];
+  Map<String, String> coinValues = {};
   @override
   void initState() {
     super.initState();
@@ -26,7 +26,7 @@ class _PriceScreenState extends State<PriceScreen> {
   isWaiting = true;
     try {
       //6: Update this method to receive a Map containing the crypto:price key value pairs.
-      List<String> ratedata = await CoinData().fetchDataList(_selectedCurrency);
+      var ratedata = await CoinData().fetchDataList(_selectedCurrency);
       //7. Third, as soon the above line of code completes, we now have the data and no longer need to wait. So we can set isWaiting to false.
       isWaiting = false;
       setState(() {
@@ -95,16 +95,16 @@ class _PriceScreenState extends State<PriceScreen> {
                 CryptoCard(
                 cryptoCurrency: 'BTC',
                 //7. Finally, we use a ternary operator to check if we are waiting and if so, we'll display a '?' otherwise we'll show the actual price data.
-                value: isWaiting ? '?' : coinValues[0],
+                value: isWaiting ? '?' : coinValues['BTC'],
                 selectedCurrency: _selectedCurrency),
                   CryptoCard(
                 cryptoCurrency: 'ETH',
-                value: isWaiting ? '?' : coinValues[1],
+                value: isWaiting ? '?' : coinValues['ETH'],
                 selectedCurrency: _selectedCurrency,
               ),
               CryptoCard(
                 cryptoCurrency: 'LTC',
-                value: isWaiting ? '?' : coinValues[2],
+                value: isWaiting ? '?' : coinValues['LTC'],
                 selectedCurrency: _selectedCurrency,
               ),
               ]),
