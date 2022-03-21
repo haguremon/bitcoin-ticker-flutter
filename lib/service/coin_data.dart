@@ -37,7 +37,7 @@ const coinapiURL = 'https://rest.coinapi.io/v1/exchangerate/';
 class CoinData {
   //List<decodeData>を取ってくる
   Future fetchDataList(String currency) async {
-    final List<Future<String>> futures = <Future<String>>[];
+     List<Future<String>> futures = <Future<String>>[];
 
     Future<String> f(String coinapiURL) async {
        print(coinapiURL + ' start');
