@@ -45,6 +45,7 @@ class CoinData {
         double lastPrice = decodedData['rate'];
         //Create a new key value pair, with the key being the crypto symbol and the value being the lastPrice of that crypto currency.
         cryptoPrices[crypto] = lastPrice.toStringAsFixed(0);
+          print(lastPrice.toStringAsFixed(0));
       } else {
         print(response.statusCode);
         throw 'Problem with the get request';
