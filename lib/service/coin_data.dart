@@ -35,28 +35,22 @@ const coinapiURLString = 'https://rest.coinapi.io/v1/exchangerate/';
 
 class CoinData {
   //List<decodeData>を取ってくる
-  Future<List<dynamic>> fetchDataList(String currency) async {
-    List<String> coinapiURLs = cryptoList.map((String crypto) {
-      String coinapiURL = '$coinapiURLString$crypto/$currency?apikey=$apikey';
-      return coinapiURL;
-    }).toList();
-    List<dynamic> dataList =
-        await Future.wait(coinapiURLs.map((String coinapiURL) async {
-      NetworkHelper networkHelper = NetworkHelper(coinapiURL);
-      var list = await networkHelper.fetchData();
-      return list;
-    }).toList())
-            .then(
-      (content) {
-        return content;
-      },
-    ).catchError(
-      (e) {
-        
-        e = 'Problem with the get request';
-        throw e;
-      },
-    );
-    return dataList;
+  Future<List<String>> fetchDataList(String currency) async {
+    final List<Future<String>> futures = <Future<String>>[];
+    Future<String> f(String coinapiURL) async {
+      var coinData = await NetworkHelper(coinapiURL).fetchData();
+      print(coinData);
+      return coinData.toStringAsFixed(0).padLeft(6, ' ');
+    }
+
+    cryptoList.forEach((crypto) {
+      futures.add(f('$coinapiURLString$crypto/$currency?apikey=$apikey'));
+    });
+
+    return await Future.wait(futures);
+
+    // return await Future.wait(cryptoList.map((crypto) {
+    //   return f('$coinapiURLString$crypto/$currency?apikey=$apikey');
+    // }));
   }
 }

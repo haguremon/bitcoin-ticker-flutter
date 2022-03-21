@@ -5,15 +5,15 @@ class NetworkHelper {
   final String url;
   NetworkHelper(this.url);
 
-  Future<dynamic> fetchData() async {
+  Future<double> fetchData() async {
     http.Response response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      String data = response.body;
-      var decodeData = jsonDecode(data);
-      return decodeData;
+      var decodedData = jsonDecode(response.body);
+      double lastPrice = decodedData['rate'];
+      return lastPrice;
     } else {
-      print(response.statusCode);
+      throw '${response.statusCode}';
     }
   }
 }

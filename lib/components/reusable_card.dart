@@ -1,31 +1,36 @@
 
 
 import 'package:flutter/material.dart';
+//1: Refactor this Padding Widget into a separate Stateless Widget called CryptoCard, so we can create 3 of them, one for each cryptocurrency.
+class CryptoCard extends StatelessWidget {
+  //2: You'll need to able to pass the selectedCurrency, value and cryptoCurrency to the constructor of this CryptoCard Widget.
+  const CryptoCard({
+    this.value,
+    this.selectedCurrency,
+    this.cryptoCurrency,
+  });
 
-class ReusableCard extends StatelessWidget {
-  final String label;
-
-  // ignore: use_key_in_widget_constructors
-  const ReusableCard({required this.label});
+  final String? value;
+  final String? selectedCurrency;
+  final String? cryptoCurrency;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 0),
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
       child: Card(
         color: Colors.lightBlueAccent,
         elevation: 5.0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        child:  Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 28.0),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
           child: Text(
-            label,
+            '1 $cryptoCurrency = $value $selectedCurrency',
             textAlign: TextAlign.center,
-            textScaleFactor: 1,
-            style:const TextStyle(
-              fontSize: 18.0,
+            style: TextStyle(
+              fontSize: 20.0,
               color: Colors.white,
             ),
           ),

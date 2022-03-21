@@ -7,54 +7,30 @@ import 'dart:io'
 
 // ignore: use_key_in_widget_constructors
 class PriceScreen extends StatefulWidget {
-  final List<dynamic> audRateData;
-  // ignore: prefer_const_constructors_in_immutables, use_key_in_widget_constructors
-  const PriceScreen({required this.audRateData});
-
   @override
   _PriceScreenState createState() => _PriceScreenState();
 }
 
 class _PriceScreenState extends State<PriceScreen> {
   String _selectedCurrency = 'AUD';
-  int? _btcrate;
-  int? _ethrate;
-  int? _ltcrate;
-  String errorMessage = '取得できませんでした';
-
+  bool isWaiting = false;
+  List<String> coinValues = [];
   @override
   void initState() {
     super.initState();
     getData();
   }
 
-  void fetchAUDrate(List<dynamic> rateAUDListData) async {
-    await updataUI(rateAUDListData);
-  }
-
-  Future updataUI(List<dynamic> rataListData) async {
-    setState(() {
-      if (rataListData.contains([null, null, null])) {
-        return;
-      }
-      _btcrate = rataListData[0]['rate'].toInt() ?? 0;
-      _ethrate = rataListData[1]['rate'].toInt() ?? 0;
-      _ltcrate = rataListData[2]['rate'].toInt() ?? 0;
-    });
-  }
-
   void getData() async {
     //7: Second, we set it to true when we initiate the request for prices.
-
+  isWaiting = true;
     try {
       //6: Update this method to receive a Map containing the crypto:price key value pairs.
-      List<dynamic> ratedata =
-          await CoinData().fetchDataList(_selectedCurrency);
+      List<String> ratedata = await CoinData().fetchDataList(_selectedCurrency);
       //7. Third, as soon the above line of code completes, we now have the data and no longer need to wait. So we can set isWaiting to false.
+      isWaiting = false;
       setState(() {
-        _btcrate = ratedata[0]['rate'].toInt() ?? 0;
-        _ethrate = ratedata[1]['rate'].toInt() ?? 0;
-        _ltcrate = ratedata[2]['rate'].toInt() ?? 0;
+        coinValues = ratedata;
       });
     } catch (e) {
       print(e);
@@ -67,10 +43,8 @@ class _PriceScreenState extends State<PriceScreen> {
         onSelectedItemChanged: (value) async {
           setState(() {
             _selectedCurrency = currenciesList[value];
+            getData();
           });
-          List<dynamic> ratedata =
-              await CoinData().fetchDataList(_selectedCurrency);
-          await updataUI(ratedata);
         },
         itemExtent: 20,
         children: currenciesList.map<Text>((String currency) {
@@ -88,7 +62,7 @@ class _PriceScreenState extends State<PriceScreen> {
         height: 2,
         color: Colors.white,
       ),
-      onChanged: (String? newValue) async {
+      onChanged: (String? newValue) {
         setState(() {
           _selectedCurrency = newValue!;
           getData();
@@ -118,18 +92,21 @@ class _PriceScreenState extends State<PriceScreen> {
           Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                ReusableCard(
-                  label:
-                      '1 ${cryptoList[0]} = ${_btcrate ?? errorMessage} $_selectedCurrency',
-                ),
-                ReusableCard(
-                  label:
-                      '1 ${cryptoList[1]} = ${_ethrate ?? errorMessage} $_selectedCurrency',
-                ),
-                ReusableCard(
-                  label:
-                      '1 ${cryptoList[2]} = ${_ltcrate ?? errorMessage} $_selectedCurrency',
-                ),
+                CryptoCard(
+                cryptoCurrency: 'BTC',
+                //7. Finally, we use a ternary operator to check if we are waiting and if so, we'll display a '?' otherwise we'll show the actual price data.
+                value: isWaiting ? '?' : coinValues[0],
+                selectedCurrency: _selectedCurrency),
+                  CryptoCard(
+                cryptoCurrency: 'ETH',
+                value: isWaiting ? '?' : coinValues[1],
+                selectedCurrency: _selectedCurrency,
+              ),
+              CryptoCard(
+                cryptoCurrency: 'LTC',
+                value: isWaiting ? '?' : coinValues[2],
+                selectedCurrency: _selectedCurrency,
+              ),
               ]),
           Container(
             height: 70.0,
